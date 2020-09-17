@@ -1,4 +1,4 @@
-package main.java.Connection;
+package Connection;
 
 interface clientClosed {
     void onClose(SocketCommHandler conn);

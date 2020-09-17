@@ -1,4 +1,4 @@
-package main.java.Connection;
+package Connection;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -8,18 +8,15 @@ import java.util.List;
 
 public class Server {
 
-    public List<SocketCommHandler> connectionHandlers = new ArrayList<SocketCommHandler>();
+    public List<SocketCommHandler> connectionHandlers = new ArrayList<>();
 
     private ServerConnHandler connHandler;
 
-    private int port;
-    private ServerSocket serverSock;
+    private final int port;
     private int maxConns;
     public boolean isActive = false;
 
-    public messageIn msgRecv = (message, connNum) -> {
-        System.out.println("Message received (" + connNum + "): " + message);
-    };
+    public messageIn msgRecv = (message, connNum) -> System.out.println("Message received (" + connNum + "): " + message);
 
     public clientClosed onClose = this::removeConn;
 
@@ -32,13 +29,13 @@ public class Server {
         this.maxConns = maxConns;
     }
 
-    public boolean start () throws IOException {
+    public boolean start () {
         System.out.println("Initialising Server.");
 
         isActive = true;
         try {
             // Create the server socket
-            serverSock = new ServerSocket(port);
+            ServerSocket serverSock = new ServerSocket(port);
 
             connHandler = new ServerConnHandler(serverSock, this, maxConns);
             connHandler.start();
@@ -91,11 +88,9 @@ public class Server {
     }
 
     public List<Integer> getConnectionNumbers(){
-        List<Integer> connNums = new ArrayList<Integer>();
+        List<Integer> connNums = new ArrayList<>();
 
-        connectionHandlers.forEach(conn -> {
-            connNums.add(conn.getConnNum());
-        });
+        connectionHandlers.forEach(conn -> connNums.add(conn.getConnNum()));
 
         return connNums;
     }

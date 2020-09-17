@@ -1,7 +1,5 @@
-package main.java;
-
-import main.java.Connection.Client;
-import main.java.Connection.Server;
+import Connection.Client;
+import Connection.Server;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,7 +12,7 @@ public class main {
     // 0 = server, 1 = client
     private static int mode = 0;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         Scanner sc= new Scanner(System.in);
         System.out.print("Run as Server (0) or Client (1): ");
@@ -30,26 +28,28 @@ public class main {
         }
     }
 
-    private static void runServer() throws  IOException{
+    private static void runServer(){
         Server server = new Server();
         server.start();
 
         Scanner sc = new Scanner(System.in);
         String input;
-        while(true) {
+        boolean running = true;
+        while(running) {
             input = sc.nextLine();
 
             switch (input) {
-                case "exit" -> server.close();
+                case "exit" ->  {
+                    running = false;
+                    server.close();
+                }
                 case "remove all" -> server.closeAllConnections();
                 case "get conns" -> {
                     List<Integer> connNums = server.getConnectionNumbers();
 
                     if (connNums.size() != 0) {
                         System.out.print("Connection Numbers: ");
-                        connNums.forEach(num -> {
-                            System.out.print(num + ", ");
-                        });
+                        connNums.forEach(num -> System.out.print(num + ", "));
                         System.out.println();
                     } else {
                         System.out.println("No active connections.");

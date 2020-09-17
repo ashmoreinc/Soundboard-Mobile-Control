@@ -1,4 +1,4 @@
-package main.java.Connection;
+package Connection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,18 +10,18 @@ import java.util.List;
 
 
 public class SocketCommHandler extends Thread{
-    private List<String> messages = new ArrayList<String>();
+    private List<String> messages = new ArrayList<>();
 
-    private Socket sock;
-    private PrintWriter out;
-    private BufferedReader in;
+    private final Socket sock;
+    private final PrintWriter out;
+    private final BufferedReader in;
 
-    private messageIn onRecv;
+    private final messageIn onRecv;
 
     public boolean running;
 
     private int connNum;
-    public static List<SocketCommHandler> activeComms = new ArrayList<SocketCommHandler>();
+    public static List<SocketCommHandler> activeComms = new ArrayList<>();
 
     private static final String CLOSE_CONN_MSG = "CLOSECONN";
 

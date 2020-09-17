@@ -1,4 +1,4 @@
-package main.java.Connection;
+package Connection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,9 +15,7 @@ public class Client{
     private PrintWriter out;
     private BufferedReader in;
 
-    private messageIn msgRecv = (message, connNum) -> {
-        System.out.println("Message Received: " + message);
-    };
+    private messageIn msgRecv = (message, connNum) -> System.out.println("Message Received: " + message);
 
     public SocketCommHandler commHandler;
 

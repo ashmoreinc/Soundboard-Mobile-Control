@@ -1,4 +1,4 @@
-package main.java.Connection;
+package Connection;
 
 interface messageIn {
     void messageRecv(String message, int connNum);

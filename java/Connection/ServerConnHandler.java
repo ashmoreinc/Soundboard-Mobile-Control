@@ -1,4 +1,4 @@
-package main.java.Connection;
+package Connection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 class ServerConnHandler extends Thread{
     private final ServerSocket sock;
@@ -58,7 +59,11 @@ class ServerConnHandler extends Thread{
                 parent.addConn(t);
 
             } catch (IOException exception) {
-                exception.printStackTrace();
+                System.err.println("Closing socket");
+                close();
+            } catch (Exception e) {
+                System.err.println("Unknown exception.");
+                e.printStackTrace();
             }
         }
     }
