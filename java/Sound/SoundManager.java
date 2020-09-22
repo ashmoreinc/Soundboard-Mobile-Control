@@ -179,9 +179,13 @@ public class SoundManager {
     }
 
     public boolean removeFile(String filename){
-        // TODO: Create the remove file function
-        System.out.println("Does nothing yet.");
-        return true;
+        File file = new File(fileRoot + "/" + soundFolder + "/" + filename);
+
+        if(file.exists()) {
+            return file.delete();
+        }
+
+        return false;
     }
 
     // Control sounds
