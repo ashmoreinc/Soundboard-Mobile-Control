@@ -1,7 +1,6 @@
 package Sound;
 
 import java.io.*;
-import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -35,7 +34,7 @@ public class SoundManager {
 
     // Handle File names and storage
     private void initialise () throws Exception {
-        if(checkManifest()){
+        if(checkFilelocations()){
             parseFilenames();
         } else {
             String manifestLoc = fileRoot + "/" + manifestFolder  + "/" + manifestFile;
@@ -43,11 +42,26 @@ public class SoundManager {
         }
     }
 
-    private boolean checkManifest () {
+    private boolean checkFilelocations() {
         // Checks if the manifest exists. If it doesn't create one.
-        String manifestLoc = fileRoot + "/" + manifestFolder  + "/" + manifestFile;
+        String manifestLoc = fileRoot + "/" + manifestFolder;
+        String audioLoc = fileRoot + "/" + soundFolder;
 
-        File manifest = new File(manifestLoc);
+        File manifestDir = new File(manifestLoc);
+        File soundsDir = new File(audioLoc);
+        File manifest = new File(manifestLoc  + "/" + manifestFile);
+
+        if(!soundsDir.exists()) {
+            if(!soundsDir.mkdirs()){
+                return false;
+            }
+        }
+
+        if(!manifestDir.exists()) {
+            if(!manifestDir.mkdirs()){
+                return false;
+            }
+        }
 
         if(!manifest.exists()){
             try {

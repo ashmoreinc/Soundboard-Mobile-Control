@@ -1,23 +1,37 @@
 import Connection.Client;
 import Connection.Server;
-import Sound.SoundManager;
 
+import java.net.InetAddress;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class PCApp {
 
     public static void main(String[] args) {
-        try {
-            SoundManager sound = new SoundManager();
+        discoveryTest();
+    }
 
-            Map<String, String> sounds = sound.getSounds();
+    public static void discoveryTest() {
+        Scanner reader = new Scanner(System.in);
 
-            sounds.forEach((name, filename) -> System.out.println(name + " || " + filename));
+        System.out.println("type 's' for server and 'c' for client.");
+        String input = reader.nextLine();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (input.equals("s")) {
+            System.out.println("Starting listener server.");
+
+            Connection.Discovery.Server listener = new Connection.Discovery.Server();
+            listener.start();
+        } else {
+            System.out.println("Starting server discovery.");
+            List<InetAddress> servers = Connection.Discovery.Client.getServers();
+
+            if(servers == null) {
+                System.out.println("An issue arose when getting the servers.");
+            } else {
+                System.out.println("The following servers were found: ");
+                servers.forEach(System.out::println);
+            }
         }
     }
 
@@ -51,6 +65,7 @@ public class PCApp {
                 case "exit" ->  {
                     running = false;
                     server.close();
+                    
                 }
                 case "remove all" -> server.closeAllConnections();
                 case "get conns" -> {
