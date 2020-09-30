@@ -41,6 +41,8 @@ public class Server extends Thread{
 
                 String input = new String(recvPack.getData(), 0, recvPack.getLength());
 
+                System.out.println("Input: " + input);
+
                 // Send acknowledgement
                 sock.send(sendPack);
             } catch (IOException exception) {

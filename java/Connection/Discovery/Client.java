@@ -45,6 +45,7 @@ public class Client{
 
         // Send the message
         try {
+            System.out.println("Message: " + sendMessage + " is being sent");
             sock.send(pack);
         } catch (IOException e) {
             System.err.println("IOException when sending packet.");
@@ -64,6 +65,7 @@ public class Client{
 
         while(System.currentTimeMillis() < endTime) {
             try {
+                System.out.println("Acknowledgement received from: " + recvPack.getAddress());
                 sock.receive(recvPack);
 
                 addrs.add(recvPack.getAddress());
