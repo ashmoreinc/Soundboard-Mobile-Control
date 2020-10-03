@@ -3,11 +3,10 @@ package Connection.Discovery;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
-public class Client{
+public class DiscoveryClient {
     private static final int msTimeout = 5000;
     private static final int msWaittime = 7500;
     private static int port = 1998;
@@ -102,7 +101,7 @@ public class Client{
 
     public static void setPort(int port) throws PortOutOfRangeException {
         if (0 <= port && port <= 65535) {
-            Client.port = port;
+            DiscoveryClient.port = port;
         } else {
             throw new PortOutOfRangeException();
         }
@@ -113,6 +112,6 @@ public class Client{
     }
 
     public static void setSendMessage(String sendMessage) {
-        Client.sendMessage = sendMessage;
+        DiscoveryClient.sendMessage = sendMessage;
     }
 }

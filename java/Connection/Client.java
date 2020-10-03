@@ -49,4 +49,8 @@ public class Client{
         isActive = false;
         commHandler.close();
     }
+
+    public boolean isActive(){
+        return isActive;
+    }
 }

@@ -6,7 +6,7 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 
-public class Server extends Thread{
+public class DiscoveryServer extends Thread{
     // TODO: Change the acknowledgement to return useful information about the server
     private String ackMsg;
     private int port = 1998;
@@ -14,17 +14,17 @@ public class Server extends Thread{
     private boolean running = false;
     private boolean paused = false;
 
-    public Server(){
+    public DiscoveryServer(){
         // Set defaults
         this.ackMsg = "ack";
         this.port = 1998;
     }
 
-    public Server(String acknowledgement) {
+    public DiscoveryServer(String acknowledgement) {
         this.ackMsg = acknowledgement;
     }
 
-    public Server(int port, String acknowledgement){
+    public DiscoveryServer(int port, String acknowledgement){
         this.port = port;
         this.ackMsg = acknowledgement;
     }
@@ -87,7 +87,7 @@ public class Server extends Thread{
         paused = !paused;
     }
 
-    public void off(){
+    public void close(){
         this.interrupt();
         running = false;
     }

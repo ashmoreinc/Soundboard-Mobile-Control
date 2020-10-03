@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 
 class ServerConnHandler extends Thread{
     private final ServerSocket sock;
@@ -16,7 +15,6 @@ class ServerConnHandler extends Thread{
     private int connNumber = 0;
 
     private boolean running;
-
 
     ServerConnHandler(ServerSocket sock, Server parent, int maxConns) {
         this.sock = sock;
@@ -61,11 +59,13 @@ class ServerConnHandler extends Thread{
             } catch (IOException exception) {
                 System.err.println("Closing socket");
                 close();
+                break;
             } catch (Exception e) {
                 System.err.println("Unknown exception.");
                 e.printStackTrace();
             }
         }
+        parent.closeAllConnections();
     }
 
     private int nextNum(){

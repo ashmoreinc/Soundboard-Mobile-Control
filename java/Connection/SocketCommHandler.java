@@ -48,7 +48,6 @@ public class SocketCommHandler extends Thread{
         String recv;
         running = true;
         while (running) {
-            // Handle IOException in the readline
             try {
                 if ((recv = in.readLine()) == null) {
                     running = false;

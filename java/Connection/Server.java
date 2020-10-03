@@ -1,16 +1,20 @@
 package Connection;
 
+import Connection.Discovery.DiscoveryServer;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class Server {
-
+    private ReentrantLock connHandlerLock = new ReentrantLock();
     public List<SocketCommHandler> connectionHandlers = new ArrayList<>();
 
     private ServerConnHandler connHandler;
+    private DiscoveryServer discoveryServer;
 
     private final int port;
     private int maxConns;
@@ -35,7 +39,7 @@ public class Server {
         isActive = true;
 
         // Start the discovery server
-        Connection.Discovery.Server discoveryServer = new Connection.Discovery.Server("sbs|sbs-port:" + this.port);
+        discoveryServer = new DiscoveryServer("sbs|sbs-port:" + this.port);
         discoveryServer.start();
 
         try {
@@ -57,46 +61,83 @@ public class Server {
 
     // Manage the store connections
     public void addConn(SocketCommHandler conn) {
-        connectionHandlers.add(conn);
+        connHandlerLock.lock();
+        try {
+            connectionHandlers.add(conn);
+        } finally {
+            connHandlerLock.unlock();
+        }
     }
 
-    public void removeConn(SocketCommHandler conn) { connectionHandlers.remove(conn);}
+    public void removeConn(SocketCommHandler conn) {
+        connHandlerLock.lock();
+        try {
+            connectionHandlers.remove(conn);
+        } finally {
+            connHandlerLock.unlock();
+        }
+    }
 
     // Manage the connections/overall socket
     public void close(){
+        discoveryServer.close();
         connHandler.close();
     }
 
     public void closeConnectionIdx(int index) {
-        if(connectionHandlers.size() <= index || index < 0) {
-            throw new ArrayIndexOutOfBoundsException();
-        } else {
-            connectionHandlers.get(index).close();
-            connectionHandlers.remove(index);
+        connHandlerLock.lock();
+        try {
+            if (connectionHandlers.size() <= index || index < 0) {
+                throw new ArrayIndexOutOfBoundsException();
+            } else {
+                connectionHandlers.get(index).close();
+                connectionHandlers.remove(index);
+            }
+        } finally {
+            connHandlerLock.unlock();
         }
     }
 
     public void closeConnection(int connNum) {
-        connectionHandlers.forEach(conn -> {
-            if(conn.getConnNum() == connNum) {
-                conn.close();
-            }
-        });
+        connHandlerLock.lock();
+        try {
+            List<SocketCommHandler> connsToClose = new ArrayList<>();
+            connectionHandlers.forEach(conn -> {
+                if (conn.getConnNum() == connNum) {
+                    conn.close(); // Close the connection and add it to the list to be removed after
+
+                    connsToClose.add(conn);
+                }
+            });
+
+            connsToClose.forEach(conn -> connectionHandlers.remove(conn));
+        } finally {
+            connHandlerLock.unlock();
+        }
     }
 
-
     public void closeAllConnections() {
-        connectionHandlers.forEach(conn -> {
-            conn.close();
-            connectionHandlers.remove(conn);
-        });
+        connHandlerLock.lock();
+        try {
+            for(int i=0; i < connectionHandlers.size(); i++){
+                connectionHandlers.get(i).close();
+            }
+
+            connectionHandlers = new ArrayList<>();
+        } finally {
+            connHandlerLock.unlock();
+        }
     }
 
     public List<Integer> getConnectionNumbers(){
         List<Integer> connNums = new ArrayList<>();
 
-        connectionHandlers.forEach(conn -> connNums.add(conn.getConnNum()));
-
+        connHandlerLock.lock();
+        try {
+            connectionHandlers.forEach(conn -> connNums.add(conn.getConnNum()));
+        } finally {
+            connHandlerLock.unlock();
+        }
         return connNums;
     }
 }

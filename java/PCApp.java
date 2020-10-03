@@ -1,8 +1,8 @@
 import Connection.Client;
+import Connection.Discovery.DiscoveryClient;
 import Connection.Server;
 
 import java.net.InetAddress;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +18,7 @@ public class PCApp {
 
         if(input.equals("c")){
             // Get the possible servers
-            List<InetAddress> servers = Connection.Discovery.Client.getServers();
+            List<InetAddress> servers = DiscoveryClient.getServers();
 
             if (servers == null) {
                 System.out.println("An error occurred while fetching the servers.");
@@ -87,7 +87,7 @@ public class PCApp {
 
         Scanner sc = new Scanner(System.in);
         String input;
-        while(true) {
+        while(client.isActive()) {
             input = sc.nextLine();
 
             if(input.equals("exit")){
