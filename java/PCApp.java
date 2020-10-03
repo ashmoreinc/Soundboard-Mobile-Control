@@ -2,52 +2,48 @@ import Connection.Client;
 import Connection.Server;
 
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PCApp {
 
     public static void main(String[] args) {
-        discoveryTest();
-    }
+        Scanner read = new Scanner(System.in);
 
-    public static void discoveryTest() {
-        Scanner reader = new Scanner(System.in);
+        System.out.println("Server(s) or client(c)? ");
 
-        System.out.println("type 's' for server and 'c' for client.");
-        String input = reader.nextLine();
+        String input = read.nextLine();
 
-        if (input.equals("s")) {
-            System.out.println("Starting listener server.");
-
-            Connection.Discovery.Server listener = new Connection.Discovery.Server();
-            listener.start();
-        } else {
-            System.out.println("Starting server discovery.");
+        if(input.equals("c")){
+            // Get the possible servers
             List<InetAddress> servers = Connection.Discovery.Client.getServers();
 
-            if(servers == null) {
-                System.out.println("An issue arose when getting the servers.");
+            if (servers == null) {
+                System.out.println("An error occurred while fetching the servers.");
             } else {
-                System.out.println("The following servers were found: ");
-                servers.forEach(System.out::println);
+                System.out.println("Servers available: ");
+                AtomicInteger index = new AtomicInteger();
+                servers.forEach(serv -> {
+                    System.out.println(index + "\t||\t" + serv);
+                    index.addAndGet(1);
+                });
+                System.out.print("Server choice: ");
+
+                int option = read.nextInt();
+
+                if(option < servers.size() && option >=0){
+                    InetAddress addr = servers.get(option);
+                    runClient(9001, addr.getHostName());
+                } else {
+                    System.out.println("Server choice was out of range.");
+                }
             }
-        }
-    }
-
-    public void beginConnection () {
-        Scanner sc= new Scanner(System.in);
-        System.out.print("Run as Server (0) or Client (1): ");
-
-        // 0 = server, 1 = client
-        int mode = sc.nextInt();
-
-        System.out.println("Mode chosen: " + mode);
-
-        switch (mode) {
-            case 0 -> runServer();
-            case 1 -> runClient();
-            default -> System.out.println("Mode is incorrect. Exiting.");
+        } else if(input.equals("s")){
+            runServer();
+        } else {
+            System.out.println("Invalid option.");
         }
     }
 
@@ -65,7 +61,6 @@ public class PCApp {
                 case "exit" ->  {
                     running = false;
                     server.close();
-                    
                 }
                 case "remove all" -> server.closeAllConnections();
                 case "get conns" -> {
@@ -84,11 +79,9 @@ public class PCApp {
         }
     }
 
-    private static void runClient(){
+    private static void runClient(int port, String hostname){
         System.out.println("Initialising Client.");
-        int portNumber = 9001;
-        String hostName = "localhost";
-        Client client = new Client(portNumber, hostName);
+        Client client = new Client(port, hostname);
 
         client.start();
 

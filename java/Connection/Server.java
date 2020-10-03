@@ -33,6 +33,11 @@ public class Server {
         System.out.println("Initialising Server.");
 
         isActive = true;
+
+        // Start the discovery server
+        Connection.Discovery.Server discoveryServer = new Connection.Discovery.Server("sbs|sbs-port:" + this.port);
+        discoveryServer.start();
+
         try {
             // Create the server socket
             ServerSocket serverSock = new ServerSocket(port);

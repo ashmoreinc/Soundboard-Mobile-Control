@@ -1,10 +1,10 @@
 package Connection.Discovery;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 
 public class Client{
@@ -13,19 +13,19 @@ public class Client{
     private static int port = 1998;
     private static String sendMessage = "sbsloc";
 
-    public static @Nullable
-    List<InetAddress> getServers() {
+    public static List<InetAddress> getServers() {
         // Create the socket
         DatagramSocket sock;
+
         try {
             sock = new DatagramSocket();
+
             sock.setSoTimeout(msTimeout);
             sock.setBroadcast(true);
         } catch (SocketException e) {
             System.err.println("Error creating socket. ");
             e.printStackTrace();
 
-            sock = null;
             return null;
         }
 
@@ -34,23 +34,34 @@ public class Client{
         DatagramPacket pack;
 
         try {
-            pack = new DatagramPacket(buff, buff.length, InetAddress.getByName("255.255.255.255"), port);
-        } catch (UnknownHostException e) {
-            System.err.println("Unknown host 255.255.255.255");
+            // Loop through all network interfaces and broadcast the message to each of the broadcast addresses
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while(interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = interfaces.nextElement();
+                if (networkInterface.isLoopback()) // Skip if it is this device
+                    continue;
+                for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
+                    InetAddress broadcast = interfaceAddress.getBroadcast();
+                    if (broadcast == null)
+                        continue;
+
+                    // Form the packet
+
+                    pack = new DatagramPacket(buff, buff.length, broadcast, port);
+
+                    // Send the message
+                    try {
+                        System.out.println("Message: " + sendMessage + " is being sent");
+                        sock.send(pack);
+                    } catch (IOException e) {
+                        System.err.println("IOException when sending packet.");
+                        e.printStackTrace();
+
+                    }
+                }
+            }
+        } catch (SocketException e) {
             e.printStackTrace();
-
-            pack = null;
-            return null;
-        }
-
-        // Send the message
-        try {
-            System.out.println("Message: " + sendMessage + " is being sent");
-            sock.send(pack);
-        } catch (IOException e) {
-            System.err.println("IOException when sending packet.");
-            e.printStackTrace();
-
             return null;
         }
 
@@ -65,7 +76,6 @@ public class Client{
 
         while(System.currentTimeMillis() < endTime) {
             try {
-                System.out.println("Acknowledgement received from: " + recvPack.getAddress());
                 sock.receive(recvPack);
 
                 addrs.add(recvPack.getAddress());
